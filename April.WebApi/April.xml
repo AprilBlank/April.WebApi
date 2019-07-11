@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>April.WebApi</name>
+    </assembly>
+    <members>
+        <member name="M:April.WebApi.Controllers.ValuesController.Get">
+            <summary>
+            这就是个测试接口
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:April.WebApi.Controllers.ValuesController.Get(System.Int32)">
+            <summary>
+            这就是个测试接口1
+            </summary>
+            <param name="id">就是个id</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

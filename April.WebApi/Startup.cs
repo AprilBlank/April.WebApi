@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using April.Service.Common.Depends;
+using April.Util;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
@@ -30,6 +32,8 @@ namespace April.WebApi
 
             XmlConfigurator.Configure(repository, new FileInfo("Config/log4net.config"));//配置文件路径可以自定义
             BasicConfigurator.Configure(repository);
+
+            AprilConfig.InitConfig(configuration);
         }
 
         //log4net日志
@@ -40,6 +44,8 @@ namespace April.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ServiceInjection.ConfigureRepository(services);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

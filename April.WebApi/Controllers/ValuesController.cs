@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using April.Entity;
+using April.Service.Interfaces;
 using April.Util;
+using April.Util.Entitys;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace April.WebApi.Controllers
 {
@@ -12,6 +16,13 @@ namespace April.WebApi.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+
+        private readonly IStudentService _service;
+
+        public ValuesController(IStudentService service)
+        {
+            _service = service;
+        }
 
         // GET api/values
         /// <summary>
@@ -21,10 +32,43 @@ namespace April.WebApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            LogUtil.Info("测试");
+            //日志测试
+            //LogUtil.Info("测试");
+
+            //Cache测试
             //CacheUtil.Set("cachetest", "fwejio2123", new TimeSpan(0, 0, 10));//10s
+
+            //Session测试
             //SessionUtil.SetSession("test", "test");
-            CookieUtil.SetCookies("apirlcookietest", "这是个中文测试");
+
+            //Cookie测试
+            //CookieUtil.SetCookies("apirlcookietest", "这是个中文测试");
+
+            
+            StudentEntity entity = new StudentEntity();
+            //新增
+            entity.Name = "小明";
+            entity.Age = 18;
+            entity.Number = "007";
+            entity.Sex = 0;
+            entity.Address = "大洛阳";
+
+            _service.Insert(entity);
+
+            //修改
+            //SqlFilterEntity filter = new SqlFilterEntity();
+            //filter.Append($"ID=@ID");
+            //filter.Add("@ID", 1);
+            //entity = _service.GetEntity(filter);
+            //if (entity != null)
+            //{
+            //    //entity.Name = "我被修改了";
+            //    //_service.Update(entity);
+
+            //    _service.Delete(entity);
+            //}
+
+
             return new string[] { "value1", "value2" };
         }
         /// <summary>
@@ -39,7 +83,13 @@ namespace April.WebApi.Controllers
             string value = string.Empty;
             //value = CacheUtil.Get<string>("cachetest");
             //value = SessionUtil.GetSession("test");
-            value = CookieUtil.GetCookies("apirlcookietest");
+            //value = CookieUtil.GetCookies("apirlcookietest");
+
+            int count = 0;
+            List<StudentEntity> lists = _service.GetPageList(id, 10, "", null, "", out count);
+
+            value = JsonConvert.SerializeObject(lists);
+
             return value;
         }
 

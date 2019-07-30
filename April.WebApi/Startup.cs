@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using April.Service.Common.Depends;
 using April.Util;
+using April.WebApi.Filters;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
@@ -81,10 +82,13 @@ namespace April.WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseMiddleware<ExceptionFilter>();
+            app.UseMiddleware<AuthFilter>();
+
             Util.AprilConfig.ServiceProvider = app.ApplicationServices;
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
             else
             {

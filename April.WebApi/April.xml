@@ -17,5 +17,18 @@
             <param name="id">就是个id</param>
             <returns></returns>
         </member>
+        <member name="M:April.WebApi.Filters.ExceptionFilter.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            
+            </summary>
+            <param name="next"></param>
+        </member>
+        <member name="M:April.WebApi.Filters.ExceptionFilter.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

@@ -32,6 +32,38 @@ namespace April.Util
             }
         }
 
+        private static string _AllowUrl = string.Empty;
+        /// <summary>
+        /// 链接白名单（可不做身份验证）
+        /// </summary>
+        public static List<string> AllowUrl
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_AllowUrl))
+                {
+                    _AllowUrl = Configuration["AllowUrl"];
+                }
+                List<string> listUrls = new List<string>();
+                if (!string.IsNullOrEmpty(_AllowUrl))
+                {
+                    string[] urls = System.Text.RegularExpressions.Regex.Split(_AllowUrl, ",");
+                    if (urls.Length > 0)
+                    {
+                        foreach (string url in urls)
+                        {
+                            if (!listUrls.Contains(url))
+                            {
+                                listUrls.Add(url);
+                            }
+                        }
+                    }
+                    
+                }
+                return listUrls;
+            }
+        }
+
         /// <summary>
         /// 统一请求页面实体
         /// </summary>

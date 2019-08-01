@@ -26,9 +26,9 @@ namespace April.Util
                 response.Headers.Add("Access-Control-Allow-Origin", "*");
                 response.Headers.Add("Access-Control-Allow-Credentials", "true");
                 //因为这个是json
-                response.ContentType = "application/json;charset=utf-8";
+                response.ContentType = "application/json;charset=utf-8;";
                 response.StatusCode = 200;
-                response.ContentLength = text.Length;
+                //response.ContentLength = text.Length;
                 return response.WriteAsync(text);
             }
             else

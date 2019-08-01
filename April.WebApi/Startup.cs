@@ -20,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using AspectCore.Extensions.DependencyInjection;
 
 namespace April.WebApi
 {
@@ -43,7 +44,7 @@ namespace April.WebApi
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ServiceInjection.ConfigureRepository(services);
 
@@ -77,6 +78,11 @@ namespace April.WebApi
                 options.Cookie.HttpOnly = true;//设置在浏览器不能通过js获得该cookie的值,实际场景根据自身需要
             });
             #endregion
+
+
+            services.AddAspectCoreContainer();
+            return services.BuildAspectInjectorProvider();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

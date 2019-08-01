@@ -44,16 +44,16 @@ namespace April.WebApi.Controllers
             //Cookie测试
             //CookieUtil.SetCookies("apirlcookietest", "这是个中文测试");
 
-            
-            StudentEntity entity = new StudentEntity();
-            //新增
-            entity.Name = "小明";
-            entity.Age = 18;
-            entity.Number = "007";
-            entity.Sex = 0;
-            entity.Address = "大洛阳";
 
-            _service.Insert(entity);
+            //StudentEntity entity = new StudentEntity();
+            ////新增
+            //entity.Name = "小明";
+            //entity.Age = 18;
+            //entity.Number = "007";
+            //entity.Sex = 0;
+            //entity.Address = "大洛阳";
+
+            //_service.Insert(entity);
 
             //修改
             //SqlFilterEntity filter = new SqlFilterEntity();
@@ -68,6 +68,7 @@ namespace April.WebApi.Controllers
             //    _service.Delete(entity);
             //}
 
+            _service.Test();
 
             return new string[] { "value1", "value2" };
         }

@@ -4,6 +4,33 @@
         <name>April.WebApi</name>
     </assembly>
     <members>
+        <member name="M:April.WebApi.Controllers.FileController.RequestUploadFile(April.Util.Entitys.Requests.RequestFileUploadEntity)">
+            <summary>
+            请求上传文件
+            </summary>
+            <param name="requestFile">请求上传参数实体</param>
+            <returns></returns>
+        </member>
+        <member name="M:April.WebApi.Controllers.FileController.FileSave">
+            <summary>
+            文件上传
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:April.WebApi.Controllers.FileController.FileMerge(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            文件合并
+            </summary>
+            <param name="fileInfo">文件参数信息[name]</param>
+            <returns></returns>
+        </member>
+        <member name="M:April.WebApi.Controllers.FileController.GetCryptoString(System.IO.Stream)">
+            <summary>
+            文件流加密
+            </summary>
+            <param name="fileStream"></param>
+            <returns></returns>
+        </member>
         <member name="M:April.WebApi.Controllers.ValuesController.Get">
             <summary>
             这就是个测试接口

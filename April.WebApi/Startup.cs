@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using AspectCore.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 namespace April.WebApi
 {
@@ -79,6 +80,27 @@ namespace April.WebApi
             });
             #endregion
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", p =>
+                {
+                    p.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+                });
+            });
+
+            //只是示例，具体根据自身需要
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSome", p =>
+                 {
+                     p.WithOrigins("https://www.baidu.com")
+                     .WithMethods("GET", "POST")
+                     .WithHeaders(HeaderNames.ContentType, "x-custom-header");
+                 });
+            });
 
             services.AddAspectCoreContainer();
             return services.BuildAspectInjectorProvider();
@@ -113,6 +135,8 @@ namespace April.WebApi
             #endregion
 
             app.UseSession();
+
+            app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
             app.UseMvc();

@@ -64,6 +64,20 @@ namespace April.Util
             }
         }
 
+        private static string _FilePath = string.Empty;
+
+        public static string FilePath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_FilePath))
+                {
+                    _FilePath = Configuration["CommonSettings:FilePath"];
+                }
+                return _FilePath;
+            }
+        }
+
         /// <summary>
         /// 统一请求页面实体
         /// </summary>

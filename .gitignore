@@ -8,3 +8,5 @@
 /April.Service/obj
 /April.Service/bin
 /.vs
+/April.WebApi/Controllers/FileController.cs
+/April.WebApi/uploads

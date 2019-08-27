@@ -203,6 +203,147 @@ namespace April.WebApi.Controllers
             return message;
         }
 
+        /// <summary>
+        /// 请求下载文件
+        /// </summary>
+        /// <param name="fileInfo">文件参数信息[name]</param>
+        /// <returns></returns>
+        [HttpPost, Route("RequestDownload")]
+        public MessageEntity RequestDownloadFile([FromBody]Dictionary<string, object> fileInfo)
+        {
+            MessageEntity message = new MessageEntity();
+            string fileName = string.Empty;
+            string fileExt = string.Empty;
+            if (fileInfo.ContainsKey("name"))
+            {
+                fileName = fileInfo["name"].ToString();
+            }
+            if (fileInfo.ContainsKey("ext"))
+            {
+                fileExt = fileInfo["ext"].ToString();
+            }
+            if (string.IsNullOrEmpty(fileName))
+            {
+                message.Code = -1;
+                message.Msg = "文件名不能为空";
+                return message;
+            }
+            //获取对应目录下文件，如果有，获取文件开始准备分段下载
+            string filePath = $".{AprilConfig.FilePath}{DateTime.Now.ToString("yyyy-MM-dd")}/{fileName}";
+            filePath = $"{filePath}{fileExt}";
+            FileStream fs = null;
+            try
+            {
+                if (!System.IO.File.Exists(filePath))
+                {
+                    //文件为空
+                    message.Code = -1;
+                    message.Msg = "文件尚未处理完";
+                    return message;
+                }
+                fs = new FileStream(filePath, FileMode.Open);
+                if (fs.Length <= 0)
+                {
+                    //文件为空
+                    message.Code = -1;
+                    message.Msg = "文件尚未处理完";
+                    return message;
+                }
+                int shardSize = 1 * 1024 * 1024;//一次1M
+                RequestFileUploadEntity request = new RequestFileUploadEntity();
+                request.fileext = fileExt;
+                request.size = fs.Length;
+                request.count = (int)(fs.Length / shardSize);
+                if ((fs.Length % shardSize) > 0)
+                {
+                    request.count += 1;
+                }
+                request.filedata = GetCryptoString(fs);
+
+                message.Data = request;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug($"读取文件信息失败：{filePath}，错误信息：{ex.Message}");
+            }
+            finally
+            {
+                if (fs != null)
+                {
+                    fs.Close();
+                }
+            }
+
+            return message;
+        }
+
+        /// <summary>
+        /// 分段下载文件
+        /// </summary>
+        /// <param name="fileInfo">请求参数信息[index,name]</param>
+        /// <returns></returns>
+        [HttpPost, Route("Download")]
+        public async Task<IActionResult> FileDownload([FromBody]Dictionary<string, object> fileInfo)
+        {
+            //开始根据片段来下载
+            int index = 0;
+            if (fileInfo.ContainsKey("index"))
+            {
+                int.TryParse(fileInfo["index"].ToString(), out index);
+            }
+            else
+            {
+                return Ok(new { code = -1, msg = "缺少参数" });
+            }
+            string fileName = string.Empty;
+            string fileExt = string.Empty;
+            if (fileInfo.ContainsKey("name"))
+            {
+                fileName = fileInfo["name"].ToString();
+            }
+            if (fileInfo.ContainsKey("ext"))
+            {
+                fileExt = fileInfo["ext"].ToString();
+            }
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return Ok(new { code = -1, msg = "文件名不能为空" });
+            }
+            //获取对应目录下文件，如果有，获取文件开始准备分段下载
+            string filePath = $".{AprilConfig.FilePath}{DateTime.Now.ToString("yyyy-MM-dd")}/{fileName}";
+            filePath = $"{filePath}{fileExt}";
+            if (!System.IO.File.Exists(filePath))
+            {
+                return Ok(new { code = -1, msg = "文件尚未处理" });
+            }
+            using (var fs = new FileStream(filePath, FileMode.Open))
+            {
+                if (fs.Length <= 0)
+                {
+                    return Ok(new { code = -1, msg = "文件尚未处理" });
+                }
+                int shardSize = 1 * 1024 * 1024;//一次1M
+                int count = (int)(fs.Length / shardSize);
+                if ((fs.Length % shardSize) > 0)
+                {
+                    count += 1;
+                }
+                if (index > count - 1)
+                {
+                    return Ok(new { code = -1, msg = "无效的下标" });
+                }
+                fs.Seek(index * shardSize, SeekOrigin.Begin);
+                if (index == count - 1)
+                {
+                    //最后一片 = 总长 - (每次片段大小 * 已下载片段个数)
+                    shardSize = (int)(fs.Length - (shardSize * index));
+                }
+                byte[] datas = new byte[shardSize];
+                await fs.ReadAsync(datas, 0, datas.Length);
+                //fs.Close();
+                return File(datas, "application/x-gzip");
+            }
+        }
 
         /// <summary>
         /// 文件流加密

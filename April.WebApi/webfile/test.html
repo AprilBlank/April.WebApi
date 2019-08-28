@@ -1,0 +1,266 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+
+<body>
+    <div class="Article-Box">
+        <div class="Article-Content" style="width: 750px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">示意文件</label>
+                <div class="layui-input-inline">
+                    <div class="upImageStyle">
+                        <div class="upImage"><img src="" id="listImage" /></div>
+                        <div class="downImage">
+                            <button type="button" class="layui-btn" id="fileDemo">
+                                <i class="layui-icon"></i>上传文件
+                            </button>
+                            <input type="hidden" id="hiddenListImage" name="VideoImage" value="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">
+                    <div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="layui-btn" id="btnDownload">下载</button>
+    </div>
+    <script src="layui/layui.js"></script>
+    <script>
+        var form;
+        var $;
+        var succeed = 0
+            , shardCount = 0;
+        var t1;
+
+        layui.use(['upload', 'form', 'element'],
+            function () {
+                form = layui.form;
+                $ = layui.$;
+                var upload = layui.upload;
+                var element = layui.element;
+                var host = "http://localhost:53467/api/";
+                var guid = "";
+                var uploadMaxCount = 0;
+                upload.render({
+                    elem: '#fileDemo',
+                    auto: false,
+                    accept: 'file', 
+                    choose: function (obj) {
+                        obj.preview(function (index, file) {
+
+                            console.log(index); //得到文件索引
+                            console.log(file); //得到文件对象
+
+                            var name = file.name, //文件名
+                                size = file.size; //总大小
+
+                            var shardSize = 1 * 1024 * 1024; //以1MB为一个分片
+                            shardCount = Math.ceil(size / shardSize); //总片数
+                            uploadMaxCount = shardCount;
+                            //md5页面没法操作默认一个字符串
+                            var md5 = "08e951e3da639bb4197d52222458b5dd";
+                            var data = {
+                                "size": size,
+                                "count": shardCount,
+                                "filedata": md5,
+                                "fileext": file.name.substring(file.name.indexOf("."))
+                            };
+                            $.ajax({
+                                url: host + "File/RequestUpload",
+                                data: JSON.stringify(data),
+                                type: "POST",
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                timeout: 3600,
+                                success: function (res) {
+                                    console.log(res);
+                                    if (res.code === -1 || res.code === 2) {
+                                        layer.alert(decodeURIComponent(res.msg));
+                                        return;
+                                    }
+                                    guid = res.data.filename;
+                                    if (guid !== "") {
+                                        RequestUpload(file, guid, shardSize, size);
+                                    }
+                                }
+                            });
+                        });
+
+                        return false;
+                    }
+                });
+
+                var uploadIndex = 0;
+
+                function RequestUpload(file, guid, shardSize, size) {
+                    //计算每一片的起始与结束位置
+                    var start = uploadIndex * shardSize,
+                        end = Math.min(size, start +
+                            shardSize);
+
+                    var objf = file.slice(start, end);
+
+                    //构造一个表单，FormData是HTML5新增的
+                    var form = new FormData();
+                    form.append("data", file.slice(start,
+                        end)); //slice方法用于切出文件的一部分
+                    form.append("filename", guid);
+                    form.append("fileindex", uploadIndex); //当前是第几片
+                    //Ajax提交
+                    $.ajax({
+                        url: host + "File/Upload",
+                        type: "POST",
+                        data: form,
+                        async: true, //异步
+                        processData: false, //很重要，告诉jquery不要对form进行处理
+                        contentType: false, //很重要，指定为false才能形成正确的Content-Type
+                        success: function (res) {
+                            console.log(res);
+                            if (res.code === -1) {
+                                layer.alert(decodeURIComponent(res.msg));
+                                return;
+                            } else {
+                                uploadIndex++;
+                                ++succeed;
+                                var percent = succeed / shardCount * 100;
+                                var fixed = percent.toFixed(2);
+                                element.progress('demo', fixed + '%');
+                                if (uploadIndex !== uploadMaxCount) {
+                                    sleep(1000);//临时等待
+                                    RequestUpload(file, guid, shardSize, size);
+                                } else {
+                                    if (succeed === shardCount) {
+                                        holdForRequest();
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                }
+
+                function holdForRequest() {
+                    if (succeed === shardCount) {
+                        var data = {
+                            name: guid
+                        };
+                        //Ajax提交
+                        $.ajax({
+                            url: host + "File/Merge",
+                            type: "POST",
+                            data: JSON.stringify(data),
+                            type: "POST",
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            timeout: 3600,
+                            success: function (res) {
+                                if (res.code === -1) {
+                                    layer.alert(decodeURIComponent(res.msg));
+                                    return;
+                                } else {
+                                    console.log("总算特么是完了");
+                                }
+                            }
+                        });
+                    }
+                }
+
+                function sleep(delay) {
+                    var start = (new Date()).getTime();
+                    while ((new Date()).getTime() - start < delay) {
+                        continue;
+                    }
+                }
+
+                $("#btnDownload").on("click", function (e) {
+                    downloadRequest();
+                });
+
+                function downloadRequest() {
+                    //请求文件
+                    var data = {
+                        name: '26b1dbe562a84f10b942983d15108caa.65.3.tar',
+                        ext: '.gz',
+                    };
+                    //Ajax提交
+                    $.ajax({
+                        url: host + "File/RequestDownload",
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        type: "POST",
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        timeout: 36000,
+                        success: function (res) {
+                            if (res.code === -1) {
+                                //layer.alert(decodeURIComponent(res.msg));
+                                console.log(res);
+                                return;
+                            } else {
+                                console.log(res.data);
+                                //拿到文件开始分片下载
+                                var count = res.data.count;
+                                var filedata = res.data.fieldata;
+                                var fileext = res.data.fileext;
+                                var size = res.data.size;
+                                maxCount = count -1 ;
+                                download();
+                                window.clearInterval(t1);
+                            }
+                        }
+                    });
+                }
+
+                var maxCount = 0;
+                var index = 0;
+                function download() {
+                    var data = {
+                        index: index,
+                        name: '26b1dbe562a84f10b942983d15108caa.65.3.tar',
+                        ext: '.gz',
+                    };
+                    //console.log(index);
+                    //console.log(maxCount);
+                    //Ajax提交
+                    $.ajax({
+                        url: host + "File/Download",
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        type: "POST",
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        timeout: 36000,
+                        success: function (res) {
+                            console.log(index + ":over");
+                            index++;
+                            if (index <= maxCount) {
+                                download();
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(textStatus);
+                            console.log(index + ":errorover");
+                            index++;
+                            if (index <= maxCount) {
+                                download();
+                            } else {
+                                console.log("all_over");
+                            }
+                        }
+                    });
+                }
+            });
+    </script>
+</body>
+
+</html>

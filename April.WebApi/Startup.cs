@@ -102,6 +102,8 @@ namespace April.WebApi
                  });
             });
 
+            services.AddHttpClient();
+
             services.AddAspectCoreContainer();
             return services.BuildAspectInjectorProvider();
 

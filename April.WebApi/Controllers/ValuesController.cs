@@ -6,6 +6,7 @@ using April.Entity;
 using April.Service.Interfaces;
 using April.Util;
 using April.Util.Entitys;
+using April.Util.Entitys.QyThird;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -68,7 +69,13 @@ namespace April.WebApi.Controllers
             //    _service.Delete(entity);
             //}
 
-            _service.Test();
+            //_service.Test();
+
+            //QyThridUtil.GetAccessToken();
+            MessageRange range = new MessageRange();
+            range.Users = new List<string>();
+            range.Users.Add("10001");
+            QyThridUtil.SendMessage("我就是来测试", range, AprilEnums.MessageType.Text);
 
             return new string[] { "value1", "value2" };
         }

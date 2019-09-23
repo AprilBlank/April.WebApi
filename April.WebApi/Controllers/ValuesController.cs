@@ -33,19 +33,29 @@ namespace April.WebApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            string value2 = string.Empty;
+
+            #region ========日志测试========
             //日志测试
             //LogUtil.Info("测试");
+            #endregion
 
+            #region ========Cache测试========
             //Cache测试
             //CacheUtil.Set("cachetest", "fwejio2123", new TimeSpan(0, 0, 10));//10s
+            #endregion
 
+            #region ========Session测试========
             //Session测试
             //SessionUtil.SetSession("test", "test");
+            #endregion
 
+            #region ========Cookie测试========
             //Cookie测试
             //CookieUtil.SetCookies("apirlcookietest", "这是个中文测试");
+            #endregion
 
-
+            #region ========SqlSugar测试========
             //StudentEntity entity = new StudentEntity();
             ////新增
             //entity.Name = "小明";
@@ -69,15 +79,46 @@ namespace April.WebApi.Controllers
             //    _service.Delete(entity);
             //}
 
-            //_service.Test();
+            #endregion
 
+            #region ========Aop测试========
+            _service.Test();
+            #endregion
+
+            #region ========企业微信测试========
+            //企业微信信息发送
             //QyThridUtil.GetAccessToken();
-            MessageRange range = new MessageRange();
-            range.Users = new List<string>();
-            range.Users.Add("10001");
-            QyThridUtil.SendMessage("我就是来测试", range, AprilEnums.MessageType.Text);
+            //MessageRange range = new MessageRange();
+            //range.Users = new List<string>();
+            //range.Users.Add("10001");
+            //QyThridUtil.SendMessage("我就是来测试", range, AprilEnums.MessageType.Text);
+            #endregion
 
-            return new string[] { "value1", "value2" };
+            #region ========Redis测试========
+            //添加
+            StudentEntity student = new StudentEntity();
+            student.ID = 3;
+            student.Name = "小明";
+            student.Number = "201245";
+            student.Sex = 0;
+            student.Age = 18;
+            student.Address = "洛阳市";
+            RedisUtil.Add("student_1", student);
+            //获取
+            StudentEntity student1 = RedisUtil.Get<StudentEntity>("student_1");
+            value2 = JsonConvert.SerializeObject(student1);
+            //覆盖
+            student.Name = "小红";
+            student.Age = 16;
+            student.Address = "不知道哪个村";
+            student.Sex = 1;
+            RedisUtil.Replace("student_1", student);
+            //删除
+            RedisUtil.Remove("student_1");
+            #endregion
+
+
+            return new string[] { "value1", value2 };
         }
         /// <summary>
         /// 这就是个测试接口1

@@ -65,7 +65,9 @@ namespace April.Util
         }
 
         private static string _FilePath = string.Empty;
-
+        /// <summary>
+        /// 文件路径
+        /// </summary>
         public static string FilePath
         {
             get
@@ -75,6 +77,42 @@ namespace April.Util
                     _FilePath = Configuration["CommonSettings:FilePath"];
                 }
                 return _FilePath;
+            }
+        }
+
+        private static string _IsOpenCache = string.Empty;
+        /// <summary>
+        /// 是否使用Redis
+        /// </summary>
+        public static bool IsOpenCache
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_IsOpenCache))
+                {
+                    _IsOpenCache = Configuration["Redis:IsOpenRedis"];
+                }
+                if (_IsOpenCache.ToLower() == "true")
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private static string _RedisConnectionString = string.Empty;
+        /// <summary>
+        /// Redis默认连接串
+        /// </summary>
+        public static string RedisConnectionString
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_RedisConnectionString))
+                {
+                    _RedisConnectionString = Configuration["Redis:ConnectionString"];
+                }
+                return _RedisConnectionString;
             }
         }
 

@@ -37,6 +37,7 @@ namespace April.WebApi
             BasicConfigurator.Configure(repository);
 
             AprilConfig.InitConfig(configuration);
+            RedisUtil.InitRedis();
         }
 
         //log4net日志

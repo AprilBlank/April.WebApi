@@ -7,9 +7,11 @@ using April.Service.Interfaces;
 using April.Util;
 using April.Util.Entitys;
 using April.Util.Entitys.QyThird;
+using April.WebApi.Jobs;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Quartz;
 
 namespace April.WebApi.Controllers
 {
@@ -95,31 +97,60 @@ namespace April.WebApi.Controllers
             #endregion
 
             #region ========Redis测试========
-            //添加
-            StudentEntity student = new StudentEntity();
-            student.ID = 3;
-            student.Name = "小明";
-            student.Number = "201245";
-            student.Sex = 0;
-            student.Age = 18;
-            student.Address = "洛阳市";
-            RedisUtil.Add("student_1", student);
-            //获取
-            StudentEntity student1 = RedisUtil.Get<StudentEntity>("student_1");
-            value2 = JsonConvert.SerializeObject(student1);
-            //覆盖
-            student.Name = "小红";
-            student.Age = 16;
-            student.Address = "不知道哪个村";
-            student.Sex = 1;
-            RedisUtil.Replace("student_1", student);
-            //删除
-            RedisUtil.Remove("student_1");
+            ////添加
+            //StudentEntity student = new StudentEntity();
+            //student.ID = 3;
+            //student.Name = "小明";
+            //student.Number = "201245";
+            //student.Sex = 0;
+            //student.Age = 18;
+            //student.Address = "洛阳市";
+            //RedisUtil.Add("student_1", student);
+            ////获取
+            //StudentEntity student1 = RedisUtil.Get<StudentEntity>("student_1");
+            //value2 = JsonConvert.SerializeObject(student1);
+            ////覆盖
+            //student.Name = "小红";
+            //student.Age = 16;
+            //student.Address = "不知道哪个村";
+            //student.Sex = 1;
+            //RedisUtil.Replace("student_1", student);
+            ////删除
+            //RedisUtil.Remove("student_1");
             #endregion
 
 
             return new string[] { "value1", value2 };
         }
+
+        [HttpGet]
+        [Route("QuartzTest")]
+        public void QuartzTest(int type)
+        {
+            JobKey jobKey = new JobKey("demo","group1");
+            switch (type)
+            {
+                //添加任务
+                case 1:
+                    var trigger = TriggerBuilder.Create()
+                            .WithDescription("触发器描述")
+                            .WithIdentity("test")
+                            //.WithSchedule(CronScheduleBuilder.CronSchedule("0 0/30 * * * ? *").WithMisfireHandlingInstructionDoNothing())
+                            .WithSimpleSchedule(x=>x.WithIntervalInSeconds(5).RepeatForever().WithMisfireHandlingInstructionNextWithRemainingCount())
+                            .Build();
+                    QuartzUtil.Add(typeof(MyJob), jobKey, trigger);
+                    break;
+                //暂停任务
+                case 2:
+                    QuartzUtil.Stop(jobKey);
+                    break;
+                //恢复任务
+                case 3:
+                    QuartzUtil.Resume(jobKey);
+                    break;
+            }
+        }
+
         /// <summary>
         /// 这就是个测试接口1
         /// </summary>

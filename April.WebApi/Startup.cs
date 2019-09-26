@@ -22,6 +22,8 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using AspectCore.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using Quartz.Impl;
+using Quartz;
 
 namespace April.WebApi
 {
@@ -51,7 +53,8 @@ namespace April.WebApi
             ServiceInjection.ConfigureRepository(services);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            //任务调度
+            services.TryAddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             #region Swagger
@@ -116,7 +119,7 @@ namespace April.WebApi
             app.UseMiddleware<ExceptionFilter>();
             app.UseMiddleware<AuthFilter>();
 
-            Util.AprilConfig.ServiceProvider = app.ApplicationServices;
+            AprilConfig.ServiceProvider = app.ApplicationServices;
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();

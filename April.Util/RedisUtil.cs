@@ -55,7 +55,7 @@ namespace April.Util
             }
             if (!string.IsNullOrEmpty(strValue))
             {
-                _redisCache.SetString(key, strValue, new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions()
+                _redisCache.SetString(key, strValue, new DistributedCacheEntryOptions()
                 {
                     AbsoluteExpiration = DateTime.Now.AddMinutes(ExprireTime)
                 });

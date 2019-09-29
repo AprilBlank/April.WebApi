@@ -18,7 +18,7 @@ namespace April.Util
         /// <param name="type">类</param>
         /// <param name="jobKey">键</param>
         /// <param name="trigger">触发器</param>
-        public static async void Add(Type type, JobKey jobKey, ITrigger trigger = null)
+        public static async Task Add(Type type, JobKey jobKey, ITrigger trigger = null)
         {
             Init();
             _scheduler = await _schedulerFactory.GetScheduler();
@@ -43,7 +43,7 @@ namespace April.Util
         /// 恢复任务
         /// </summary>
         /// <param name="jobKey">键</param>
-        public static async void Resume(JobKey jobKey)
+        public static async Task Resume(JobKey jobKey)
         {
             Init();
             _scheduler = await _schedulerFactory.GetScheduler();
@@ -54,7 +54,7 @@ namespace April.Util
         /// 停止任务
         /// </summary>
         /// <param name="jobKey">键</param>
-        public static async void Stop(JobKey jobKey)
+        public static async Task Stop(JobKey jobKey)
         {
             Init();
             _scheduler = await _schedulerFactory.GetScheduler();

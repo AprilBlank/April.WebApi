@@ -20,3 +20,7 @@ csdn：[net core Webapi基础工程搭建 总目录](https://blog.csdn.net/weixi
 #### 其他说明
 
 前端html页面，可以单独部署web（例如iis），单独建立站点，然后在appsettings配置白名单即可。
+
+#### 更新日志
+
+- 2019.10.09 从2.2升级到3.0，打算创建个新分支，为了方便查看不同点

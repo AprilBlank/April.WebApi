@@ -24,6 +24,8 @@ using AspectCore.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Quartz.Impl;
 using Quartz;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 namespace April.WebApi
 {
@@ -48,11 +50,11 @@ namespace April.WebApi
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             ServiceInjection.ConfigureRepository(services);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
             //任务调度
             services.TryAddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -60,13 +62,13 @@ namespace April.WebApi
             #region Swagger
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new Info
+                options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1.1.0",
                     Title = "April WebAPI",
                     Description = "后台框架",
-                    TermsOfService = "None",
-                    Contact = new Contact { Name = "Blank", Email = "790048789@qq.com", Url = "http://www.aprilblank.com" }
+                    //TermsOfService = "None",
+                    Contact = new OpenApiContact { Name = "Blank", Email = "1829027193@qq.com", Url = new Uri("https://www.cnblogs.com/AprilBlank/") }
                 });
                 // 为 Swagger JSON and UI设置xml文档注释路径
                 var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);//获取应用程序所在目录（绝对，不受工作目录影响，建议采用此方法获取路径）
@@ -76,12 +78,14 @@ namespace April.WebApi
             #endregion
 
             #region Session
+            services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.Cookie.Name = "April.Session";
                 options.IdleTimeout = TimeSpan.FromSeconds(2000);//设置session的过期时间
                 options.Cookie.HttpOnly = true;//设置在浏览器不能通过js获得该cookie的值,实际场景根据自身需要
-            });
+                options.Cookie.IsEssential = true;
+            });
             #endregion
 
             services.AddCors(options =>
@@ -90,8 +94,8 @@ namespace April.WebApi
                 {
                     p.AllowAnyOrigin()
                     .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
+                    .AllowAnyHeader();
+                    //.AllowCredentials();
                 });
             });
 
@@ -108,13 +112,13 @@ namespace April.WebApi
 
             services.AddHttpClient();
 
-            services.AddAspectCoreContainer();
-            return services.BuildAspectInjectorProvider();
+            //services.AddAspectCoreContainer();
+            //services.BuildAspectInjectorProvider();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionFilter>();
             app.UseMiddleware<AuthFilter>();
@@ -130,8 +134,6 @@ namespace April.WebApi
                 app.UseHsts();
             }
 
-            
-
             #region Swagger
             app.UseSwagger();
             app.UseSwaggerUI(options =>
@@ -140,14 +142,26 @@ namespace April.WebApi
             });
             #endregion
 
-            app.UseSession();
+            
 
             app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
-            app.UseMvc();
 
-            
+            app.UseSession();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseCookiePolicy();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+
         }
     }
 }

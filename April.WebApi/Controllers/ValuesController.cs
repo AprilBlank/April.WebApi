@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using April.Entity;
 using April.Service.Interfaces;
@@ -80,7 +81,6 @@ namespace April.WebApi.Controllers
 
             //    _service.Delete(entity);
             //}
-
             #endregion
 
             #region ========Aop测试========
@@ -98,14 +98,14 @@ namespace April.WebApi.Controllers
 
             #region ========Redis测试========
             ////添加
-            StudentEntity student = new StudentEntity();
-            student.ID = 3;
-            student.Name = "小明";
-            student.Number = "201245";
-            student.Sex = 0;
-            student.Age = 18;
-            student.Address = "洛阳市";
-            RedisUtil.Add("student_1", student);
+            //StudentEntity student = new StudentEntity();
+            //student.ID = 3;
+            //student.Name = "小明";
+            //student.Number = "201245";
+            //student.Sex = 0;
+            //student.Age = 18;
+            //student.Address = "洛阳市";
+            //RedisUtil.Add("student_1", student);
             ////获取
             //StudentEntity student1 = RedisUtil.Get<StudentEntity>("student_1");
             //value2 = JsonConvert.SerializeObject(student1);
@@ -166,8 +166,39 @@ namespace April.WebApi.Controllers
             //value = CookieUtil.GetCookies("apirlcookietest");
 
             int count = 0;
-            List<StudentEntity> lists = _service.GetPageList(id, 10, "", null, "", out count);
+            //List<StudentEntity> lists = _service.GetPageList(id, 10, "", null, "", out count);
+            Expression<Func<StudentEntity, bool>> where = s => s.ID == 38;
+            where.And(s => s.Name == "测试");
+            //拼接linq
+            List<StudentEntity> lists = _service.GetList(where).ToList();
+            value = JsonConvert.SerializeObject(lists);
 
+            return value;
+        }
+
+        [HttpPost]
+        [Route("ActiveSearch")]
+        public ActionResult<string> Post(StudentEntity form)
+        {
+            string value = string.Empty;
+
+            Expression<Func<StudentEntity, bool>> where = s => s.ID > 0 & s.ID < 100;
+            if (!string.IsNullOrEmpty(form.Name))
+            {
+                where = where.And(s => s.Name.Contains(form.Name));
+            }
+            if (form.Age > 0)
+            {
+                where = where.And(s => s.Age > form.Age);
+            }
+            if (!string.IsNullOrEmpty(form.Address))
+            {
+                where = where.And(s => s.Address.StartsWith(form.Address));
+            }
+
+            //where = where.Or(s => s.Number != "");
+            //拼接linq
+            List<StudentEntity> lists = _service.GetList(where).ToList();
             value = JsonConvert.SerializeObject(lists);
 
             return value;

@@ -2,6 +2,7 @@
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace April.Service
@@ -27,6 +28,12 @@ namespace April.Service
         /// <param name="filter">查询条件</param>
         /// <returns>数据集合</returns>
         ISugarQueryable<T> GetList(string field, SqlFilterEntity filter);
+        /// <summary>
+        /// 获取列表集合
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns></returns>
+        ISugarQueryable<T> GetList(Expression<Func<T, bool>> where);
 
         /// <summary>
         /// 获取列表集合

@@ -49,6 +49,7 @@ namespace April.Service
             Db.Aop.OnLogExecuted = (sql, pars) => //SQL执行完事件
             {
                 //这里可以查看执行的sql语句跟参数
+                LogUtil.Debug($"执行的sql：{sql}");
             };
             Db.Aop.OnLogExecuting = (sql, pars) => //SQL执行前事件
             {

@@ -27,7 +27,7 @@ namespace April.WebApi.Filters
             if (!headers.ContainsKey("Authorization"))
             {
                 string path = context.Request.Path.Value;
-                if (!AprilConfig.AllowUrl.Contains(path) && path.IndexOf("swagger") < 0)
+                if (!AprilConfig.AllowUrl.Contains(path) && path.IndexOf("swagger") < 0 && !path.EndsWith(".js"))
                 {
                     //这里做下相关的身份校验
                     return ResponseUtil.HandleExceptionAsync(401, "请登录");

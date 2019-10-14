@@ -139,12 +139,16 @@ namespace April.WebApi
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiHelp V1");
+                options.InjectJavascript("/jquery.min.js");
+                options.InjectJavascript("/swagger_zh.js");
             });
             #endregion
 
             
 
             app.UseCors("AllowAll");
+
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 

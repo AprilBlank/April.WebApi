@@ -3,6 +3,7 @@ using April.Util.Entitys;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace April.Service
@@ -71,6 +72,15 @@ namespace April.Service
                 filter = new SqlFilterEntity();
             }
             return db.Queryable<T>().With(SqlWith.NoLock).Select(field).WhereIF(!string.IsNullOrEmpty(filter.Filter), filter.Filter, filter.Value);
+        }
+        /// <summary>
+        /// 获取列表集合
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns></returns>
+        public ISugarQueryable<T> GetList(Expression<Func<T, bool>> where)
+        {
+            return db.Queryable<T>().With(SqlWith.NoLock).WhereIF(where != null, where);
         }
 
         /// <summary>

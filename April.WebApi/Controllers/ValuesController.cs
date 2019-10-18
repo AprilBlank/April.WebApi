@@ -123,6 +123,24 @@ namespace April.WebApi.Controllers
             return new string[] { "value1", value2 };
         }
 
+
+        [HttpGet]
+        [Route("ExportExcel")]
+        public IActionResult ExportExcel()
+        {
+            List<StudentEntity> lists = _service.GetList("", null).ToList();
+            //字典对照表
+            Dictionary<string, string> dicData = new Dictionary<string, string>();
+            dicData.Add("Name", "姓名");
+            dicData.Add("Number", "学号");
+            dicData.Add("Address", "家庭住址");
+            dicData.Add("Age", "年龄");
+            dicData.Add("Sex", "性别");
+
+            byte[] datas = ExcelUtil.ExportExcel(lists, dicData, "大洛阳学生数据");
+            return File(datas, "application/x-xls", "默认文件.xlsx");
+        }
+
         [HttpGet]
         [Route("QuartzTest")]
         public async Task QuartzTest(int type)

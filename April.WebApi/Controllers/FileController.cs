@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using April.Entity;
 using April.Util;
 using April.Util.Entitys.Requests;
 using April.Util.Entitys.Responses;
@@ -343,6 +345,15 @@ namespace April.WebApi.Controllers
                 //fs.Close();
                 return File(datas, "application/x-gzip");
             }
+        }
+
+        [HttpGet]
+        [Route("ImportExcel")]
+        public int ImportExcel()
+        {
+            string filePath = "./testfile/test.xlsx";
+            DataSet ds = ExcelUtil.ReadExcelToDataSet(filePath);
+            return ds.Tables[0].Rows.Count;
         }
 
         /// <summary>

@@ -23,4 +23,6 @@ csdn：[net core Webapi基础工程搭建 总目录](https://blog.csdn.net/weixi
 
 #### 更新日志
 
+
+- 2019.10.29 发布的教程同步更新，多平台的部署问题可参考[多平台项目发布与部署](https://www.cnblogs.com/AprilBlank/p/11757027.html)
 - 2019.10.09 从2.2升级到3.0，打算创建个新分支，为了方便查看不同点

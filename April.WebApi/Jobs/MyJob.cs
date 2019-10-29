@@ -1,8 +1,5 @@
 ﻿using April.Util;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace April.WebApi.Jobs

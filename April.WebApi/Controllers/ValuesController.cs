@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using April.Entity;
+﻿using April.Entity;
 using April.Service.Interfaces;
 using April.Util;
-using April.Util.Entitys;
-using April.Util.Entitys.QyThird;
 using April.WebApi.Jobs;
-using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Quartz;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace April.WebApi.Controllers
 {
@@ -145,7 +141,7 @@ namespace April.WebApi.Controllers
         [Route("QuartzTest")]
         public async Task QuartzTest(int type)
         {
-            JobKey jobKey = new JobKey("demo","group1");
+            JobKey jobKey = new JobKey("demo", "group1");
             switch (type)
             {
                 //添加任务
@@ -154,7 +150,7 @@ namespace April.WebApi.Controllers
                             .WithDescription("触发器描述")
                             .WithIdentity("test")
                             //.WithSchedule(CronScheduleBuilder.CronSchedule("0 0/30 * * * ? *").WithMisfireHandlingInstructionDoNothing())
-                            .WithSimpleSchedule(x=>x.WithIntervalInSeconds(5).RepeatForever().WithMisfireHandlingInstructionNextWithRemainingCount())
+                            .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever().WithMisfireHandlingInstructionNextWithRemainingCount())
                             .Build();
                     await QuartzUtil.Add(typeof(MyJob), jobKey, trigger);
                     break;

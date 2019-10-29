@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using April.Service.Common.Depends;
+﻿using April.Service.Common.Depends;
 using April.Util;
 using April.WebApi.Filters;
 using log4net;
@@ -12,20 +7,16 @@ using log4net.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
-using AspectCore.Extensions.DependencyInjection;
-using Microsoft.Net.Http.Headers;
-using Quartz.Impl;
-using Quartz;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using Quartz.Impl;
+using System;
+using System.IO;
 
 namespace April.WebApi
 {
@@ -144,7 +135,7 @@ namespace April.WebApi
             });
             #endregion
 
-            
+
 
             app.UseCors("AllowAll");
 

@@ -23,4 +23,4 @@ csdn：[net core Webapi基础工程搭建 总目录](https://blog.csdn.net/weixi
 
 #### 更新日志
 
-- 2019.10.09 从2.2升级到3.0，打算创建个新分支，为了方便查看不同点
+- 2019.10.09 从2.2升级到3.0，可切换到3.0分支查看相应代码，升级过程具体可参考[April.WebApi从2.2爬到3.0](https://www.cnblogs.com/AprilBlank/p/11642841.html)

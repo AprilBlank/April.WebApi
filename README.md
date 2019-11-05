@@ -6,6 +6,8 @@
 #### 软件架构
 常规的三层架构，不过是简化版的
 
+3.0版请移步：[April.WebApi](https://github.com/AprilBlank/April.WebApi/tree/3.0)
+
 
 #### 博客地址
 

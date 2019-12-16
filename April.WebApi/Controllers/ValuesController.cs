@@ -36,7 +36,8 @@ namespace April.WebApi.Controllers
 
             #region ========日志测试========
             //日志测试
-            //LogUtil.Info("测试");
+            LogUtil.Info("测试");
+            LogUtil.Error("错误测试");
             #endregion
 
             #region ========Cache测试========

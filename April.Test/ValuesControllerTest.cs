@@ -1,10 +1,16 @@
 ﻿using April.Entity;
 using April.Service.Interfaces;
+using April.WebApi;
 using April.WebApi.Controllers;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using Xunit;
 
@@ -12,6 +18,22 @@ namespace April.Test
 {
     public class ValuesControllerTest
     {
+        public HttpClient Client { get; }
+
+        public ValuesControllerTest()
+        {
+            var server = new TestServer(WebHost.CreateDefaultBuilder().UseStartup<Startup>());
+            Client = server.CreateClient();
+        }
+
+        [Fact]
+        public async void TestGetV2()
+        {
+            var response = await Client.GetAsync("/api/Values");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
         [Fact]
         public void TestGet()
         {

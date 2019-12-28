@@ -1,12 +1,15 @@
 ﻿using April.Service.Common.Depends;
 using April.Util;
 using April.WebApi.Filters;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,12 +19,20 @@ using Microsoft.OpenApi.Models;
 using Quartz;
 using Quartz.Impl;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace April.WebApi
 {
     public class Startup
     {
+        private static readonly List<string> _Assemblies = new List<string>()
+        {
+            "April.Service"
+        };
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -43,12 +54,12 @@ namespace April.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            ServiceInjection.ConfigureRepository(services);
+            // ServiceInjection.ConfigureRepository(services);
 
             services.AddControllers();
             //任务调度
-            services.TryAddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>()
+                .AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 
             #region Swagger
             services.AddSwaggerGen(options =>
@@ -108,6 +119,27 @@ namespace April.WebApi
 
         }
 
+        public void ConfigureContainer(ContainerBuilder container)
+        {
+            var assemblys = _Assemblies.Select(x => Assembly.Load(x)).ToList();
+            List<Type> allTypes = new List<Type>();
+            assemblys.ForEach(aAssembly =>
+            {
+                allTypes.AddRange(aAssembly.GetTypes());
+            });
+
+            // 通过Autofac自动完成依赖注入
+            container.RegisterTypes(allTypes.ToArray())
+                .AsImplementedInterfaces()
+                .PropertiesAutowired()
+                .InstancePerDependency();
+
+            // 注册Controller
+            container.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+                .Where(t => typeof(Controller).IsAssignableFrom(t) && t.Name.EndsWith("Controller", StringComparison.Ordinal))
+                .PropertiesAutowired();
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -156,7 +188,7 @@ namespace April.WebApi
                 endpoints.MapControllers();
             });
 
-
+            AutofacUtil.Container = app.ApplicationServices.GetAutofacRoot();
         }
     }
 }

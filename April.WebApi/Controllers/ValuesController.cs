@@ -36,8 +36,8 @@ namespace April.WebApi.Controllers
 
             #region ========日志测试========
             //日志测试
-            LogUtil.Info("测试");
-            LogUtil.Error("错误测试");
+            //LogUtil.Info("测试");
+            //LogUtil.Error("错误测试");
             #endregion
 
             #region ========Cache测试========
@@ -56,15 +56,20 @@ namespace April.WebApi.Controllers
             #endregion
 
             #region ========SqlSugar测试========
-            //StudentEntity entity = new StudentEntity();
-            ////新增
-            //entity.Name = "小明";
-            //entity.Age = 18;
-            //entity.Number = "007";
-            //entity.Sex = 0;
-            //entity.Address = "大洛阳";
 
-            //_service.Insert(entity);
+            IStudentService studentService = AutofacUtil.GetScopeService<IStudentService>();
+
+            StudentEntity entity = new StudentEntity
+            {
+                //新增
+                Name = "小明",
+                Age = 18,
+                Number = "007",
+                Sex = 0,
+                Address = "大洛阳"
+            };
+
+            studentService.Insert(entity);
 
             //修改
             //SqlFilterEntity filter = new SqlFilterEntity();

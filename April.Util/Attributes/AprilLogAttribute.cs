@@ -1,18 +1,19 @@
-﻿using AspectCore.DynamicProxy;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace April.Util.Attributes
 {
-    public class AprilLogAttribute : AbstractInterceptorAttribute
+    public class AprilLogAttribute : Attribute, IActionFilter
     {
-        public async override Task Invoke(AspectContext context, AspectDelegate next)
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            LogUtil.Debug("AprilLogAttribute end");
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context)
         {
             LogUtil.Debug("AprilLogAttribute begin");
-            await next(context);
-            LogUtil.Debug("AprilLogAttribute end");
+            
         }
     }
 }
